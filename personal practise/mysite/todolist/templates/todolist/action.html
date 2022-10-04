@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Document</title>
+    <style>
+      p{
+        font-size: 15px;
+      }
+      #demo{
+        background-color: red;
+      }
+      .comp{
+       border-radius:1%;
+       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      }
+      .comp:hover{
+        transition: 0.2s;
+        width: 101%;
+        height: 101%;
+        box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      }
+    </style>
+</head>
+<body>
+
+  {% if user.is_authenticated %}
+  {% for i in u%}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/todolist/action">TODO!</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/todolist/action">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " aria-current="page" href="/todolist/about/">About Us</a>
+          </li>
+          <li c lass="nav-item">
+            <a class="nav-link " aria-current="page" href="/todolist/contact/">Contact</a>
+          </li>
+        </ul>
+      </div>
+      <a class="navbar-brand" href="#">WELCOME BACK {{request.user|upper}} {{request.id}} </a>
+      <a class="navbar-brand" href="/todolist/logout/">logout</a>
+    </div>
+  </nav>  
+  <div class="container mt-5 lead">
+    <form action="/todolist/new/" method="POST">
+      {% csrf_token %}
+      <input type="hidden" value="{{i.id}}" name="uid">
+      <div class="mb-3 row">
+        <label for="ntname" class="col-sm-1 col-form-label"><B>Task : </B></label>
+        <div class="col-sm-3">
+          <input type="text" name="ntname" class="form-control">
+        </div>
+        <label for="ntask" class="col-sm-1 col-form-label"><B>Desc : </B></label>
+        <div class="col-sm-5">
+          <textarea class="form-control" name="ntask" rows="1"></textarea>  
+        </div>
+        <div class="col-sm-2 lead">
+          <button class="btn btn-primary" type="submit" >Add to list</button>    
+        </div>
+      </div>   
+    </div>
+    
+</form>
+</div>
+    <div class="container-fluid lead">
+        <div class="row align-items-start">
+          <!--Second-->
+          {% if notice != ""%}
+          <script>
+            alert("You have notice");
+          </script>
+          <div class="col">
+            <h4 class="display-6 text-danger"><b>Notice</b></h4>
+          {% for n in notice %}  
+            <div class="container-fluid border bg-light mt-2 comp"id="demo{{ee.id}}">
+              <div class="row align-items-start" >
+              <div class="col lead mt-3" >
+                  <p><B>Notice No : </B>{{forloop.counter}}</p>
+                  <p><B>Notice : </B>{{n.notice_title}}</p>
+                  <p><B>Description : </B>{{n.notice}}</p>
+                  <p><B>Status : <span  style="color:red;">Pending</span></B></p>
+                  <p><B>Issue Date : </B>12-8-2022</p>
+                  <p><B>Expiry Date : </B>12-8-2022</p>
+              </div>
+              <div class="col-3 mt-3" >
+                <button class="btn btn-danger mt-2 complete lead" type="submit"  style="width:80px" id="{{ee.id}}">Preview</button>
+              </div>
+            </div>
+          </div>
+          {% endfor%}
+        </div>
+          {% endif %}
+          <div class="col">
+            <h4 class="display-6 text-danger"><B>Pending</B></h4>
+            {%for ee in e%}
+            <div class="container-fluid border bg-light mt-2 comp lead" id="demo{{ee.id}}">
+              <div class="row align-items-start mt-3" >
+              <div class="col" >    
+                <form action="/todolist/task/" method="POST">
+                  {%csrf_token%}
+                  <input type="hidden" value="{{ee.id}}" name="tid">
+                  <input type="hidden" value="{{ee.tname}}" name="tname">
+                  <input type="hidden" value="{{ee.task}}" name="task">
+                  <input type="hidden" value="{{i.id}}" name="uid">
+                  <p><B>Task No : </B>{{forloop.counter}}</p>
+                  <p><B>Task : </B>{{ee.tname|truncatechars:9}}</p>
+                  <p><B>Description : </B>{{ee.task|truncatechars:9}}</p>
+                  <p><B>Status : <span class="text-danger">{{ee.status}}</span></B></p>
+                  <p><B>Issue Date : </B>12-8-2022</p>
+                  <p><B>Date : </B>12-8-2022</p>
+              </div>
+              <div class="col-3 lead" >
+                <button class="btn btn-success mt-2 complete lead" type="submit"  style="width:100px" >Complete</button>
+              </form>
+                <form action="/todolist/delete/" method="POST">
+                  {%csrf_token%}
+                  <input type="hidden" value="{{ee.id}}" name="tid">
+                  <input type="hidden" value="{{ee.tname}}" name="tname">
+                  <input type="hidden" value="{{ee.task}}" name="task">
+                  <input type="hidden" value="{{i.id}}" name="uid">
+                <button class="btn btn-danger mt-2 lead" type="submit" style="width:100px"  id="{{ee.id}}">Delete</button></form>
+              </div>
+            
+            </div>
+          </div>
+          {%endfor%}
+          </div>
+          <!--second completed-->
+          <div class="col">
+            <h6 class="display-6 text-success"><B>Complete</B></h6>
+            {%for ee in donet%}
+            <div class="container-fluid border bg-light mt-2 comp"id="demo{{ee.id}}">
+              <div class="row align-items-start" >
+              <div class="col lead mt-3" >
+                <form action="/todolist/preview/{{ee.id}}" method="POST">
+                  {%csrf_token%}
+                  <input type="hidden" value="{{ee.id}}" name="tid">
+                  <input type="hidden" value="{{ee.tname}}" name="tname">
+                  <input type="hidden" value="{{ee.task}}" name="task">
+                  <input type="hidden" value="{{i.id}}" name="uid">
+                  <p><B>Task No : </B>{{forloop.counter}}</p>
+                  <p><B>Task : </B>{{ee.tname|truncatechars:9}}</p>
+                  <p><B>Description : </B>{{ee.task|truncatechars:9}}</p>
+                  <p><B>Status : <span  style="color:green;">Completed</span></B></p>
+                  <p><B>Issue Date : </B>12-8-2022</p>
+                  <p><B>Date : </B>12-8-2022</p>
+              </div>
+              <div class="col-3 mt-3" >
+                <button class="btn btn-primary mt-2 complete lead" type="submit"  style="width:80px" id="{{ee.id}}">Preview</button>
+              </div>
+            </form>
+            </div>
+          </div>
+          {%endfor%}
+          </div>
+          
+    {% endfor%}
+    {% else %}
+          <script>
+            window.location.replace('/todolist/login/')
+          </script>
+    {% endif %}
+    <script>
+        function completebtn(){
+          console.log(document.getElementById('completebtn').innerHTML);
+          //document.getElementById('completebtn').remove()
+          var d = document.getElementById('completebtn').innerHTML;
+          let id = document.getElementsByClassName("col");
+          console.log(id);
+
+        }
+        function reply_click(clicked_id)
+  {
+      //alert(clicked_id);
+      var str = "c";
+      var num = clicked_id; 
+      document.getElementById(num).remove();
+      str += num;
+      //alert(str);
+      var z= "c"+clicked_id;
+      //var s = document.getElementById(clicked_id);
+      //console.log(str);
+      var a = document.getElementById('demo'+clicked_id).remove();
+      //console.log(a);
+      window.location.replace("/todolist/delete")
+  }
+  function myFunction() {
+  location.replace("todolist/action/")
+}
+    </script>
+</body>
+</html>
